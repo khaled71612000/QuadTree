@@ -30,6 +30,11 @@ void AQuadtreeNode::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	DrawDebugBox(GetWorld(), Center, FVector(Size, Size, 0), FColor::Green, false, -1, 0, 5);
 
+	for (const FVector& Point : Points)
+	{
+		DrawDebugPoint(GetWorld(), Point, 10, FColor::Red, false, -1);
+	}
+
 	if (Divided)
 	{
 		NE->Tick(DeltaTime);
@@ -43,15 +48,15 @@ void AQuadtreeNode::Subdivide()
 {
 	float NewSize = Size / 2;
 
-	NE = GetWorld()->SpawnActor<AQuadtreeNode>(AQuadtreeNode::StaticClass(), FVector(Center.X + NewSize, Center.Y + NewSize, 0), FRotator::ZeroRotator);
-	NW = GetWorld()->SpawnActor<AQuadtreeNode>(AQuadtreeNode::StaticClass(), FVector(Center.X - NewSize, Center.Y + NewSize, 0), FRotator::ZeroRotator);
-	SE = GetWorld()->SpawnActor<AQuadtreeNode>(AQuadtreeNode::StaticClass(), FVector(Center.X + NewSize, Center.Y - NewSize, 0), FRotator::ZeroRotator);
-	SW = GetWorld()->SpawnActor<AQuadtreeNode>(AQuadtreeNode::StaticClass(), FVector(Center.X - NewSize, Center.Y - NewSize, 0), FRotator::ZeroRotator);
+	NE = GetWorld()->SpawnActor<AQuadtreeNode>(AQuadtreeNode::StaticClass(), FVector(Center.X + NewSize, Center.Y + NewSize, Center.Z), FRotator::ZeroRotator);
+	NW = GetWorld()->SpawnActor<AQuadtreeNode>(AQuadtreeNode::StaticClass(), FVector(Center.X - NewSize, Center.Y + NewSize, Center.Z), FRotator::ZeroRotator);
+	SE = GetWorld()->SpawnActor<AQuadtreeNode>(AQuadtreeNode::StaticClass(), FVector(Center.X + NewSize, Center.Y - NewSize, Center.Z), FRotator::ZeroRotator);
+	SW = GetWorld()->SpawnActor<AQuadtreeNode>(AQuadtreeNode::StaticClass(), FVector(Center.X - NewSize, Center.Y - NewSize, Center.Z), FRotator::ZeroRotator);
 
-	NE->Initialize(FVector(Center.X + NewSize / 2, Center.Y + NewSize / 2, 0), NewSize);
-	NW->Initialize(FVector(Center.X - NewSize / 2, Center.Y + NewSize / 2, 0), NewSize);
-	SE->Initialize(FVector(Center.X + NewSize / 2, Center.Y - NewSize / 2, 0), NewSize);
-	SW->Initialize(FVector(Center.X - NewSize / 2, Center.Y - NewSize / 2, 0), NewSize);
+	NE->Initialize(FVector(Center.X + NewSize / 2, Center.Y + NewSize / 2, Center.Z), NewSize);
+	NW->Initialize(FVector(Center.X - NewSize / 2, Center.Y + NewSize / 2, Center.Z), NewSize);
+	SE->Initialize(FVector(Center.X + NewSize / 2, Center.Y - NewSize / 2, Center.Z), NewSize);
+	SW->Initialize(FVector(Center.X - NewSize / 2, Center.Y - NewSize / 2, Center.Z), NewSize);
 
 	Divided = true;
 }
@@ -80,7 +85,7 @@ void AQuadtreeNode::Insert(FVector Point)
 		SW->Insert(Point);
 	}
 }
-
+//AABB
 bool AQuadtreeNode::ContainsPoint(FVector Point)
 {
 	return Point.X >= Center.X - Size && Point.X <= Center.X + Size &&
