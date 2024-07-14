@@ -21,7 +21,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void Subdivide();
-	void Insert(FVector Point);
+	bool Insert(FVector Point);
 	bool ContainsPoint(FVector Point);
 	void Initialize(FVector InCenter, float InSize);
 
@@ -43,4 +43,12 @@ private:
 	AQuadtreeNode* NW;
 	AQuadtreeNode* SE;
 	AQuadtreeNode* SW;
+
+public:
+	// Query function to find points within a given range
+	TArray<FVector> Query(FVector RangeCenter, float RangeSize);
+
+private:
+	// Helper function to check if two rectangles intersect
+	bool Intersect(FVector RangeCenter, float RangeSize);
 };

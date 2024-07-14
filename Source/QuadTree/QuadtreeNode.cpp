@@ -28,7 +28,7 @@ void AQuadtreeNode::BeginPlay()
 void AQuadtreeNode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	DrawDebugBox(GetWorld(), Center, FVector(Size, Size, 0), FColor::Green, false, -1, 0, 5);
+	DrawDebugBox(GetWorld(), Center, FVector(Size, Size, 0), FColor::Green, false, -1, 0, 10);
 
 	for (const FVector& Point : Points)
 	{
@@ -61,16 +61,18 @@ void AQuadtreeNode::Subdivide()
 	Divided = true;
 }
 
-void AQuadtreeNode::Insert(FVector Point)
+bool AQuadtreeNode::Insert(FVector Point)
 {
 	if (!ContainsPoint(Point))
 	{
-		return;
+		return false;
 	}
 
 	if (Points.Num() < Capacity)
 	{
 		Points.Add(Point);
+		return true;
+
 	}
 	else
 	{
@@ -79,10 +81,25 @@ void AQuadtreeNode::Insert(FVector Point)
 			Subdivide();
 		}
 
-		NE->Insert(Point);
-		NW->Insert(Point);
-		SE->Insert(Point);
-		SW->Insert(Point);
+		if (NE->Insert(Point))
+		{
+			return true;
+		}
+
+		if (NW->Insert(Point))
+		{
+			return true;
+		}		
+		if (SE->Insert(Point))
+		{
+			return true;
+		}		
+		if (SW->Insert(Point))
+		{
+			return true;
+		}
+
+		return false;
 	}
 }
 //AABB
@@ -90,4 +107,42 @@ bool AQuadtreeNode::ContainsPoint(FVector Point)
 {
 	return Point.X >= Center.X - Size && Point.X <= Center.X + Size &&
 		Point.Y >= Center.Y - Size && Point.Y <= Center.Y + Size;
+}
+
+TArray<FVector> AQuadtreeNode::Query(FVector RangeCenter, float RangeSize)
+{
+	TArray<FVector> FoundPoints;
+
+	if (!Intersect(RangeCenter, RangeSize))
+	{
+		return FoundPoints;
+	}
+
+	for (const FVector& Point : Points)
+	{
+		if (Point.X >= RangeCenter.X - RangeSize && Point.X <= RangeCenter.X + RangeSize &&
+			Point.Y >= RangeCenter.Y - RangeSize && Point.Y <= RangeCenter.Y + RangeSize)
+		{
+			FoundPoints.Add(Point);
+		}
+	}
+
+	if (Divided)
+	{
+		FoundPoints.Append(NE->Query(RangeCenter, RangeSize));
+		FoundPoints.Append(NW->Query(RangeCenter, RangeSize));
+		FoundPoints.Append(SE->Query(RangeCenter, RangeSize));
+		FoundPoints.Append(SW->Query(RangeCenter, RangeSize));
+	}
+
+	return FoundPoints;
+}
+
+
+bool AQuadtreeNode::Intersect(FVector RangeCenter, float RangeSize)
+{
+	return !(RangeCenter.X - RangeSize > Center.X + Size ||
+		RangeCenter.X + RangeSize < Center.X - Size ||
+		RangeCenter.Y - RangeSize > Center.Y + Size ||
+		RangeCenter.Y + RangeSize < Center.Y - Size);
 }

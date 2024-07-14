@@ -39,4 +39,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Quadtree")
 	void InsertRandomPoints(int32 NumberOfPoints);
+
+	UFUNCTION(BlueprintCallable, Category = "Quadtree")
+	TArray<FVector> QueryPoints(FVector RangeCenter, float RangeSize);
 };

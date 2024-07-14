@@ -12,8 +12,16 @@ class QUADTREE_API AQuadTreePlayerController : public APlayerController
 public:
 	AQuadTreePlayerController();
 
-protected:
-	virtual void SetupInputComponent() override;
+	virtual void PlayerTick(float DeltaTime) override;
 
+protected:
+
+private:
 	void OnLeftMouseClick();
+	void HandleMouseClick();
+	void HandleRightHold();
+
+	bool bCanClick;
+	float ClickCooldown;
+	float LastClickTime;
 };

@@ -7,13 +7,80 @@
 AQuadTreePlayerController::AQuadTreePlayerController()
 {
 	bShowMouseCursor = true;
+	bCanClick = true;
+	ClickCooldown = 0.1f; // Cooldown period in seconds
+	LastClickTime = 0.0f;
 }
 
-void AQuadTreePlayerController::SetupInputComponent()
+void AQuadTreePlayerController::PlayerTick(float DeltaTime)
 {
-	Super::SetupInputComponent();
+	Super::PlayerTick(DeltaTime);
 
-	InputComponent->BindAction("LeftMouseClick", IE_Pressed, this, &AQuadTreePlayerController::OnLeftMouseClick);
+	// Check for left mouse button click and cooldown
+	if (IsInputKeyDown(EKeys::LeftMouseButton) && bCanClick)
+	{
+		HandleMouseClick();
+	}
+
+	if (IsInputKeyDown(EKeys::RightMouseButton))
+	{
+		HandleRightHold();
+	}
+
+	// Update cooldown timer
+	if (!bCanClick)
+	{
+		LastClickTime += DeltaTime;
+		if (LastClickTime >= ClickCooldown)
+		{
+			bCanClick = true;
+			LastClickTime = 0.0f;
+		}
+	}
+}
+
+void AQuadTreePlayerController::HandleMouseClick()
+{
+	bCanClick = false; // Disable further clicks until cooldown expires
+	OnLeftMouseClick();
+}
+
+void AQuadTreePlayerController::HandleRightHold()
+{
+
+	FVector WorldLocation, WorldDirection;
+
+	if (DeprojectMousePositionToWorld(WorldLocation, WorldDirection))
+	{
+		FPlane Plane(FVector(0, 0, 0), FVector(0, 0, 1));  // XY plane at Z = 0
+		FVector IntersectionPoint = FMath::LinePlaneIntersection(WorldLocation, WorldLocation + (WorldDirection * 10000.0f), Plane);
+
+		for (TActorIterator<AQuadtreeActor> It(GetWorld()); It; ++It)
+		{
+			AQuadtreeActor* QuadtreeActor = *It;
+			if (QuadtreeActor)
+			{
+				IntersectionPoint.Z = QuadtreeActor->GetActorLocation().Z;
+
+				// Define the range for the query
+				FVector RangeCenter = IntersectionPoint;
+				float RangeSize = 200.0f; // Adjust this size as needed
+
+				// Draw the query rectangle (bounding box)
+				FVector BoxExtent(RangeSize, RangeSize, 0.0f);
+				DrawDebugBox(GetWorld(), RangeCenter, BoxExtent, FColor::Yellow, false, -1, 100, 5.f);
+
+				// Query points in the range centered at IntersectionPoint
+				TArray<FVector> QueriedPoints = QuadtreeActor->QueryPoints(RangeCenter, RangeSize);
+				for (const FVector& Point : QueriedPoints)
+				{
+					// Visualize the queried points
+					DrawDebugPoint(GetWorld(), Point, 10.f, FColor::Blue, false, -1, 100);
+				}
+				break;
+			}
+		}
+	}
 }
 
 void AQuadTreePlayerController::OnLeftMouseClick()
@@ -22,25 +89,40 @@ void AQuadTreePlayerController::OnLeftMouseClick()
 
 	if (DeprojectMousePositionToWorld(WorldLocation, WorldDirection))
 	{
-		FVector End = WorldLocation + (WorldDirection * 10000.0f);
+		// Assuming your 2D grid is in the XY plane at Z = 0
+		FPlane Plane(FVector(0, 0, 0), FVector(0, 0, 1));  // XY plane at Z = 0
 
-		FHitResult HitResult;
-		GetWorld()->LineTraceSingleByChannel(HitResult, WorldLocation, End, ECC_Visibility);
+		// Calculate intersection of the mouse ray with the plane
+		FVector IntersectionPoint = FMath::LinePlaneIntersection(WorldLocation, WorldLocation + (WorldDirection * 10000.0f), Plane);
 
-		if (HitResult.bBlockingHit)
+		// Adjust the Z coordinate to match the grid actor's Z
+		for (TActorIterator<AQuadtreeActor> It(GetWorld()); It; ++It)
 		{
-			FVector HitLocation = HitResult.Location;
-
-			// Find the quadtree actor and insert the point
-			for (TActorIterator<AQuadtreeActor> It(GetWorld()); It; ++It)
+			AQuadtreeActor* QuadtreeActor = *It;
+			if (QuadtreeActor)
 			{
-				AQuadtreeActor* QuadtreeActor = *It;
-				if (QuadtreeActor)
-				{
-					QuadtreeActor->InsertPoint(HitLocation);
-					DrawDebugPoint(GetWorld(), HitLocation, 10, FColor::Red, false, 2.0f);
-					break;
-				}
+				IntersectionPoint.Z = QuadtreeActor->GetActorLocation().Z;
+				break;
+			}
+		}
+
+		// Debug draw the intersection point in the editor
+		DrawDebugPoint(GetWorld(), IntersectionPoint, 10.0f, FColor::Red, false, -1);
+
+		// Iterate over Quadtree actors
+		for (TActorIterator<AQuadtreeActor> It(GetWorld()); It; ++It)
+		{
+			AQuadtreeActor* QuadtreeActor = *It;
+			if (QuadtreeActor)
+			{
+				// Insert the point in local space
+				FVector LocalSpaceLocation = QuadtreeActor->GetActorTransform().InverseTransformPosition(IntersectionPoint);
+				QuadtreeActor->InsertPoint(LocalSpaceLocation);
+
+				// Debug draw the local space location
+				FVector WorldSpaceLocation = QuadtreeActor->GetActorTransform().TransformPosition(LocalSpaceLocation);
+				DrawDebugPoint(GetWorld(), WorldSpaceLocation, 10.0f, FColor::Blue, false, -1);
+				break;
 			}
 		}
 	}

@@ -60,3 +60,12 @@ void AQuadtreeActor::InsertRandomPoints(int32 NumberOfPoints)
 		InsertPoint(RandomPoint);
 	}
 }
+
+TArray<FVector> AQuadtreeActor::QueryPoints(FVector RangeCenter, float RangeSize)
+{
+	if (Root)
+	{
+		return Root->Query(RangeCenter, RangeSize);
+	}
+	return TArray<FVector>();
+}
