@@ -64,18 +64,18 @@ void AQuadTreePlayerController::HandleRightHold()
 
 				// Define the range for the query
 				FVector RangeCenter = IntersectionPoint;
-				float RangeSize = 200.0f; // Adjust this size as needed
+				float RangeSize = 1000.0f; // Adjust this size as needed
 
 				// Draw the query rectangle (bounding box)
 				FVector BoxExtent(RangeSize, RangeSize, 0.0f);
-				DrawDebugBox(GetWorld(), RangeCenter, BoxExtent, FColor::Yellow, false, -1, 100, 5.f);
+				DrawDebugBox(GetWorld(), RangeCenter, BoxExtent, FColor::Yellow, false, -1, 100, 20.f);
 
 				// Query points in the range centered at IntersectionPoint
 				TArray<FVector> QueriedPoints = QuadtreeActor->QueryPoints(RangeCenter, RangeSize);
 				for (const FVector& Point : QueriedPoints)
 				{
 					// Visualize the queried points
-					DrawDebugPoint(GetWorld(), Point, 10, FColor::Yellow, false, -1, 50);
+					DrawDebugPoint(GetWorld(), FVector(Point.X, Point.Y, RangeCenter.Z), 20, FColor::Blue, false, -1, 1000.f);
 				}
 				break;
 			}

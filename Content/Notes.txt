@@ -1,0 +1,85 @@
+# Quadtree Implementation Project
+
+This project implements a 2D quadtree data structure using Unreal Engine to efficiently manage and query spatial data. The quadtree structure is used to optimize the performance of particle systems by enabling efficient spatial queries and collision detection.
+
+## Overview
+
+The Quadtree Implementation Project aims to provide a robust and efficient way to manage spatial data in a 2D space. The project utilizes the quadtree data structure to partition the space, enabling quick insertion, deletion, and querying of points. This approach significantly improves the performance of operations like collision detection in particle systems.
+
+## Classes
+
+### AQuadtreeActor
+
+The `AQuadtreeActor` class represents the root of the quadtree. It manages the initialization and updates of the quadtree, as well as handling the insertion and querying of points.
+
+#### Key Properties
+- **Root**: The root node of the quadtree. This node is responsible for the primary partitioning of the entire space managed by the quadtree.
+- **Size**: The size of the area managed by the quadtree. This determines the spatial extent of the root node and its subdivisions.
+- **StartPoints**: Initial number of points to insert into the quadtree. This helps to populate the quadtree with some data at the beginning.
+- **Spread**: The spread of points around a center. This property determines how far the points can be spread out from a central point when they are inserted.
+
+#### Key Methods
+- `BeginPlay()`: This method is called when the game starts or when the actor is spawned. It initializes the quadtree by creating the root node and inserting initial points. It sets up the initial state of the quadtree.
+- `Tick(float DeltaTime)`: Called every frame to update the quadtree. This method can be used to update the quadtree's state or to perform continuous operations like checking for spatial queries or updating points.
+- `InsertPoint(FVector Point)`: Inserts a point into the quadtree. This method recursively inserts a point into the appropriate node, subdividing nodes as necessary to accommodate the point.
+- `ClearQuadtree()`: Clears the quadtree by deleting all nodes and resetting the root. This method is useful for resetting the quadtree to an empty state.
+- `InsertRandomPoints(int32 NumberOfPoints)`: Inserts a specified number of random points into the quadtree. This method is used to populate the quadtree with random data for testing or demonstration purposes.
+- `QueryPoints(FVector RangeCenter, float RangeSize)`: Queries points within a specified range. This method returns all points within a given rectangular area, which is useful for spatial queries and collision detection.
+
+### AQuadtreeNode
+
+The `AQuadtreeNode` class represents a single node within the quadtree. It manages the insertion and querying of points within its region, and can subdivide itself into four child nodes if necessary.
+
+#### Key Properties
+- **Center**: The center of the node. This property defines the central point of the node's region in the 2D space.
+- **Size**: The size of the node's region. This property determines the spatial extent of the node and helps in checking point containment.
+- **Capacity**: The maximum number of points the node can hold before subdividing. This property controls when the node should subdivide into smaller nodes.
+- **Points**: The list of points within the node. This property stores the points that are contained within the node's region.
+- **Divided**: A boolean indicating whether the node has been subdivided. This property helps to track if the node has already been split into smaller nodes.
+
+#### Key Methods
+- `Initialize(FVector InCenter, float InSize)`: Initializes the node with a center and size. This method sets up the node's position and size in the 2D space.
+- `Clear()`: Clears the node and its children. This method removes all points and destroys child nodes, resetting the node to its initial state.
+- `Subdivide()`: Subdivides the node into four child nodes. This method splits the node into four smaller regions, each represented by a new child node.
+- `Insert(FVector Point)`: Inserts a point into the node or its children. This method attempts to insert the point into the node, subdividing if necessary, and continues to insert into child nodes if applicable.
+- `Query(FVector RangeCenter, float RangeSize)`: Queries points within a specified range. This method returns all points within the node that fall inside a given rectangular area.
+- `ContainsPoint(FVector Point)`: Checks if the node contains a specified point. This method verifies if the given point lies within the node's region.
+- `Intersect(FVector RangeCenter, float RangeSize)`: Checks if the node intersects with a specified range. This method determines if the node's region overlaps with a given rectangular area.
+
+### AParticle
+
+The `AParticle` class represents a particle in the simulation. Each particle has a position and velocity and interacts with other particles using the quadtree.
+
+#### Key Properties
+- **Velocity**: The velocity of the particle. This property determines the direction and speed of the particle's movement.
+- **Position**: The position of the particle in the 2D space. This property specifies where the particle is located.
+- **ParticleMesh**: The visual representation of the particle. This property is a mesh component used to render the particle in the game world.
+
+#### Key Methods
+- `BeginPlay()`: Called when the game starts or when the particle is spawned. This method initializes the particle's properties and sets up its initial state.
+- `Tick(float DeltaTime)`: Called every frame to update the particle. This method updates the particle's position based on its velocity and handles any necessary interactions with other particles.
+
+### AParticleSystemActor
+
+The `AParticleSystemActor` class manages a system of particles. It uses the quadtree for efficient collision detection and spatial queries.
+
+#### Key Properties
+- **QuadtreeActor**: The quadtree actor that manages the quadtree structure. This property links the particle system to the quadtree used for spatial queries.
+- **Particles**: The list of particles in the system. This property stores all the particles managed by the system.
+- **ParticleClass**: The class of particles to spawn. This property specifies the type of particle to create.
+- **ParticlesNum**: The number of particles to spawn. This property determines how many particles the system will manage.
+- **QueryRange**: The range for querying nearby particles. This property sets the distance within which particles will be considered for interactions.
+
+#### Key Methods
+- `BeginPlay()`: Initializes the particle system when the game starts. This method sets up the quadtree and spawns the initial particles.
+- `Tick(float DeltaTime)`: Updates the particle system every frame. This method updates the positions of particles and handles interactions using the quadtree.
+- `InitializeParticles(int32 NumParticles)`: Initializes a specified number of particles. This method creates and sets up the initial particles in the system.
+- `UpdateQuadtree()`: Updates the quadtree with the current positions of all particles. This method ensures that the quadtree reflects the latest particle positions for accurate spatial queries.
+- `MeasurePerformance()`: Measures and compares the performance of collision detection with and without the quadtree. This method provides insights into the efficiency benefits of using a quadtree.
+
+## Features
+
+- **Efficient Spatial Queries**: Uses a quadtree structure to optimize spatial queries and collision detection.
+- **Dynamic Subdivision**: Nodes dynamically subdivide based on the density of points.
+- **Real-time Visualization**: Debug visualizations show quadtree partitions and queried points.
+- **Performance Metrics**: Measures and compares performance with and without quadtree optimization.

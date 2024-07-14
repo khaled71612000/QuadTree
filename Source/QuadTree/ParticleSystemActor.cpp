@@ -28,40 +28,40 @@ void AParticleSystemActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//bool bNeedsUpdate = false;
+	bool bNeedsUpdate = false;
 
-	//for (AParticle* Particle : Particles)
-	//{
-	//	Particle->Tick(DeltaTime);
+	for (AParticle* Particle : Particles)
+	{
+		Particle->Tick(DeltaTime);
 
-	//	FVector PreviousPosition = Particle->Position;
-	//	Particle->Tick(DeltaTime);  // Ensure to call the correct method to move particles
-	//	if (!bNeedsUpdate && FVector::DistSquared(PreviousPosition, Particle->Position) > FMath::Square(10.0f)) // Threshold can be adjusted
-	//	{
-	//		bNeedsUpdate = true;
-	//	}
+		FVector PreviousPosition = Particle->Position;
+		Particle->Tick(DeltaTime);  // Ensure to call the correct method to move particles
+		if (!bNeedsUpdate && FVector::DistSquared(PreviousPosition, Particle->Position) > FMath::Square(10.0f)) // Threshold can be adjusted
+		{
+			bNeedsUpdate = true;
+		}
 
-	//	Particle->SetActorLocation(Particle->Position);
-	//}
+		Particle->SetActorLocation(Particle->Position);
+	}
 
-	//if (bNeedsUpdate)
-	//{
-	//	UpdateQuadtree();
-	//}
+	if (bNeedsUpdate)
+	{
+		UpdateQuadtree();
+	}
 
-	//for (AParticle* Particle : Particles)
-	//{
-	//	TArray<FVector> NearbyParticles = QuadtreeActor->QueryPoints(Particle->GetActorLocation(), QueryRange);
+	for (AParticle* Particle : Particles)
+	{
+		TArray<FVector> NearbyParticles = QuadtreeActor->QueryPoints(Particle->GetActorLocation(), QueryRange);
 
-	//	for (const FVector& NearbyParticleLocation : NearbyParticles)
-	//	{
-	//		if (FVector::DistSquared(Particle->GetActorLocation(), NearbyParticleLocation) <= FMath::Square(QueryRange))
-	//		{
-	//			// Perform necessary collision checks or interactions here
-	//			DrawDebugLine(GetWorld(), Particle->GetActorLocation(), NearbyParticleLocation, FColor::Black, false, -1.0f, 100, 10.0f);
-	//		}
-	//	}
-	//}
+		for (const FVector& NearbyParticleLocation : NearbyParticles)
+		{
+			if (FVector::DistSquared(Particle->GetActorLocation(), NearbyParticleLocation) <= FMath::Square(QueryRange))
+			{
+				// Perform necessary collision checks or interactions here
+				DrawDebugLine(GetWorld(), Particle->GetActorLocation(), NearbyParticleLocation, FColor::Black, false, -1.0f, 100, 10.0f);
+			}
+		}
+	}
 }
 
 void AParticleSystemActor::InitializeParticles(int32 NumParticles)
@@ -86,17 +86,17 @@ void AParticleSystemActor::UpdateQuadtree()
 {
 	if (QuadtreeActor && QuadtreeActor->Root)
 	{
-		FScopedSlowTask SlowTask(0, FText::FromString(TEXT("Updating Quadtree...")));
+		//FScopedSlowTask SlowTask(0, FText::FromString(TEXT("Updating Quadtree...")));
 
-		//This method is called to show the progress dialog to the user. It should be called once after initializing FScopedSlowTask.
-		SlowTask.MakeDialog();
+		////This method is called to show the progress dialog to the user. It should be called once after initializing FScopedSlowTask.
+		//SlowTask.MakeDialog();
 
 		QuadtreeActor->ClearQuadtree();
 
 		for (AParticle* Particle : Particles)
 		{
 			//This method is called to update the progress. It should be called within the loop or steps where the task progresses, indicating the completion of a unit of work.
-			SlowTask.EnterProgressFrame();
+			//SlowTask.EnterProgressFrame();
 			QuadtreeActor->InsertPoint(Particle->GetActorLocation());
 		}
 	}
@@ -104,56 +104,56 @@ void AParticleSystemActor::UpdateQuadtree()
 
 void AParticleSystemActor::MeasurePerformance()
 {
-	double StartTime;
-	double EndTime;
+	//double StartTime;
+	//double EndTime;
 
-	// Measure performance without Quadtree
-	//FPlatformTime::Seconds() is used to get the current time in seconds. It is utilized to measure the duration of the performance test by capturing the start and end times of the operations.
-	StartTime = FPlatformTime::Seconds();
-	{
-		for (AParticle* Particle : Particles)
-		{
-			for (AParticle* OtherParticle : Particles)
-			{
-				if (Particle != OtherParticle)
-				{
-					if (FVector::DistSquared(Particle->GetActorLocation(), OtherParticle->GetActorLocation()) <= FMath::Square(QueryRange))
-					{
-						// Perform necessary collision checks or interactions here
-						DrawDebugLine(GetWorld(), Particle->GetActorLocation(), OtherParticle->GetActorLocation(), FColor::Black, false, -1.0f, 100, 10.0f);
-					}
-				}
-			}
-		}
-	}
-	//measure time after operation and see the difference
-	EndTime = FPlatformTime::Seconds();
-	TimeWithoutQuadtree = EndTime - StartTime;
+	//// Measure performance without Quadtree
+	////FPlatformTime::Seconds() is used to get the current time in seconds. It is utilized to measure the duration of the performance test by capturing the start and end times of the operations.
+	//StartTime = FPlatformTime::Seconds();
+	//{
+	//	for (AParticle* Particle : Particles)
+	//	{
+	//		for (AParticle* OtherParticle : Particles)
+	//		{
+	//			if (Particle != OtherParticle)
+	//			{
+	//				if (FVector::DistSquared(Particle->GetActorLocation(), OtherParticle->GetActorLocation()) <= FMath::Square(QueryRange))
+	//				{
+	//					// Perform necessary collision checks or interactions here
+	//					DrawDebugLine(GetWorld(), Particle->GetActorLocation(), OtherParticle->GetActorLocation(), FColor::Black, false, -1.0f, 100, 10.0f);
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
+	////measure time after operation and see the difference
+	//EndTime = FPlatformTime::Seconds();
+	//TimeWithoutQuadtree = EndTime - StartTime;
 
-	// Measure performance with Quadtree
-	////The use of a quadtree structure for collision detection in the particle system is faster compared to the brute-force method (checking every particle against every other particle) due to its spatial partitioning capabilities. 
-	StartTime = FPlatformTime::Seconds();
-	UpdateQuadtree();
-	{
-		for (AParticle* Particle : Particles)
-		{
-			//Each node in the quadtree represents a bounding box, and particles are stored in the appropriate nodes based on their positions.
-			//With a quadtree, each particle only needs to be compared against other particles in its local region and neighboring regions, rather than against all other particles.
-			TArray<FVector> NearbyParticles = QuadtreeActor->QueryPoints(Particle->GetActorLocation(), QueryRange);
-			for (const FVector& NearbyParticleLocation : NearbyParticles)
-			{
-				if (FVector::DistSquared(Particle->GetActorLocation(), NearbyParticleLocation) <= FMath::Square(QueryRange))
-				{
-					// Perform necessary collision checks or interactions here
-					DrawDebugLine(GetWorld(), Particle->GetActorLocation(), NearbyParticleLocation, FColor::Black, false, -1.0f, 100, 10.0f);
-				}
-			}
-		}
-	}
-	EndTime = FPlatformTime::Seconds();
-	TimeWithQuadtree = EndTime - StartTime;
+	//// Measure performance with Quadtree
+	//////The use of a quadtree structure for collision detection in the particle system is faster compared to the brute-force method (checking every particle against every other particle) due to its spatial partitioning capabilities. 
+	//StartTime = FPlatformTime::Seconds();
+	//UpdateQuadtree();
+	//{
+	//	for (AParticle* Particle : Particles)
+	//	{
+	//		//Each node in the quadtree represents a bounding box, and particles are stored in the appropriate nodes based on their positions.
+	//		//With a quadtree, each particle only needs to be compared against other particles in its local region and neighboring regions, rather than against all other particles.
+	//		TArray<FVector> NearbyParticles = QuadtreeActor->QueryPoints(Particle->GetActorLocation(), QueryRange);
+	//		for (const FVector& NearbyParticleLocation : NearbyParticles)
+	//		{
+	//			if (FVector::DistSquared(Particle->GetActorLocation(), NearbyParticleLocation) <= FMath::Square(QueryRange))
+	//			{
+	//				// Perform necessary collision checks or interactions here
+	//				DrawDebugLine(GetWorld(), Particle->GetActorLocation(), NearbyParticleLocation, FColor::Black, false, -1.0f, 100, 10.0f);
+	//			}
+	//		}
+	//	}
+	//}
+	//EndTime = FPlatformTime::Seconds();
+	//TimeWithQuadtree = EndTime - StartTime;
 
-	// Print the results
-	UE_LOG(LogTemp, Warning, TEXT("Time without Quadtree: %f seconds"), TimeWithoutQuadtree);
-	UE_LOG(LogTemp, Warning, TEXT("Time with Quadtree: %f seconds"), TimeWithQuadtree);
+	//// Print the results
+	//UE_LOG(LogTemp, Warning, TEXT("Time without Quadtree: %f seconds"), TimeWithoutQuadtree);
+	//UE_LOG(LogTemp, Warning, TEXT("Time with Quadtree: %f seconds"), TimeWithQuadtree);
 }
