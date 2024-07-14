@@ -46,6 +46,7 @@ void AQuadtreeActor::ClearQuadtree()
 {
 	if (Root)
 	{
+		Root->Clear();
 		Root->Destroy();
 		Root = GetWorld()->SpawnActor<AQuadtreeNode>(AQuadtreeNode::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator);
 		Root->Initialize(GetActorLocation(), Size);

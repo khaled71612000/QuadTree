@@ -20,6 +20,26 @@ void AQuadtreeNode::Initialize(FVector InCenter, float InSize)
 	Size = InSize;
 }
 
+void AQuadtreeNode::Clear()
+{
+	if (Divided)
+	{
+		NE->Clear();
+		NW->Clear();
+		SE->Clear();
+		SW->Clear();
+
+		NE->Destroy();
+		NW->Destroy();
+		SE->Destroy();
+		SW->Destroy();
+
+		Divided = false;
+	}
+
+	Points.Empty();
+}
+
 void AQuadtreeNode::BeginPlay()
 {
 	Super::BeginPlay();
@@ -32,7 +52,7 @@ void AQuadtreeNode::Tick(float DeltaTime)
 
 	for (const FVector& Point : Points)
 	{
-		DrawDebugPoint(GetWorld(), Point, 10, FColor::Red, false, -1);
+		DrawDebugPoint(GetWorld(), Point, 10, FColor::Red, false, -1, 50);
 	}
 
 	if (Divided)
@@ -72,7 +92,6 @@ bool AQuadtreeNode::Insert(FVector Point)
 	{
 		Points.Add(Point);
 		return true;
-
 	}
 	else
 	{
@@ -81,27 +100,30 @@ bool AQuadtreeNode::Insert(FVector Point)
 			Subdivide();
 		}
 
-		if (NE->Insert(Point))
+		// Attempt to insert the point into one of the child nodes
+		if (NE->ContainsPoint(Point) && NE->Insert(Point))
+		{
+			return true;
+		}
+		if (NW->ContainsPoint(Point) && NW->Insert(Point))
+		{
+			return true;
+		}
+		if (SE->ContainsPoint(Point) && SE->Insert(Point))
+		{
+			return true;
+		}
+		if (SW->ContainsPoint(Point) && SW->Insert(Point))
 		{
 			return true;
 		}
 
-		if (NW->Insert(Point))
-		{
-			return true;
-		}		
-		if (SE->Insert(Point))
-		{
-			return true;
-		}		
-		if (SW->Insert(Point))
-		{
-			return true;
-		}
-
-		return false;
+		// If none of the children can contain the point, keep it at the current level
+		Points.Add(Point);
+		return true;
 	}
 }
+
 //AABB
 bool AQuadtreeNode::ContainsPoint(FVector Point)
 {

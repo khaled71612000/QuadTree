@@ -24,12 +24,12 @@ public:
 	AQuadtreeNode* Root;
 
 	UPROPERTY(EditAnywhere, Category = "QuadTree")
-	float Size = 200;
+	float Size = 2500;
 
 	UPROPERTY(EditAnywhere, Category = "QuadTree")
-	float StartPoints = 30;
+	float StartPoints = 150;
 	UPROPERTY(EditAnywhere, Category = "QuadTree")
-	float Spread = 1500.0f;
+	float Spread = 2000;
 
 	UFUNCTION(BlueprintCallable, Category = "Quadtree")
 	void InsertPoint(FVector Point);

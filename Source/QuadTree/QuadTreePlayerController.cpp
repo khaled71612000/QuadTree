@@ -75,7 +75,7 @@ void AQuadTreePlayerController::HandleRightHold()
 				for (const FVector& Point : QueriedPoints)
 				{
 					// Visualize the queried points
-					DrawDebugPoint(GetWorld(), Point, 10.f, FColor::Blue, false, -1, 100);
+					DrawDebugPoint(GetWorld(), Point, 10, FColor::Yellow, false, -1, 50);
 				}
 				break;
 			}

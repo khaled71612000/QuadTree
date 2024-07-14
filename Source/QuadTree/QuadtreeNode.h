@@ -24,6 +24,7 @@ public:
 	bool Insert(FVector Point);
 	bool ContainsPoint(FVector Point);
 	void Initialize(FVector InCenter, float InSize);
+	void Clear();
 
 private:
 	UPROPERTY(EditAnywhere)
