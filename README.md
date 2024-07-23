@@ -51,6 +51,9 @@ The `AQuadtreeNode` class represents a single node within the quadtree. It manag
 This project is inspired by and based on the quadtree data structure discussed in the following resource:
 - [Quadtree - Wikipedia](https://en.wikipedia.org/wiki/Quadtree)
 
+[YouTube Video](https://youtu.be/NrqWvODj-Sg?si=0QXpnddWtxLZgPFo)
+
+![GIF 5](https://media.giphy.com/media/n0HjUIj5Hh2au4KlKK/giphy.gif)
 
 ![image](https://github.com/user-attachments/assets/b92da2a9-70c0-4499-8f28-b2edb2931b26)
 ![image](https://github.com/user-attachments/assets/c2808066-0890-4a0b-95cc-8e1120a93530)
