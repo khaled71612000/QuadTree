@@ -1,7 +1,9 @@
+![image](https://github.com/user-attachments/assets/b92da2a9-70c0-4499-8f28-b2edb2931b26)
 # Quadtree Implementation Project
 
 This project implements a 2D quadtree data structure using Unreal Engine to efficiently manage and query spatial data. The quadtree structure is used to optimize the performance of particle systems by enabling efficient spatial queries and collision detection.
 
+![GIF 5](https://media.giphy.com/media/n0HjUIj5Hh2au4KlKK/giphy.gif)
 ## Overview
 
 The Quadtree Implementation Project aims to provide a robust and efficient way to manage spatial data in a 2D space. The project utilizes the quadtree data structure to partition the space, enabling quick insertion, deletion, and querying of points. This approach significantly improves the performance of operations like collision detection in particle systems.
@@ -53,9 +55,6 @@ This project is inspired by and based on the quadtree data structure discussed i
 
 [YouTube Video](https://youtu.be/NrqWvODj-Sg?si=0QXpnddWtxLZgPFo)
 
-![GIF 5](https://media.giphy.com/media/n0HjUIj5Hh2au4KlKK/giphy.gif)
-
-![image](https://github.com/user-attachments/assets/b92da2a9-70c0-4499-8f28-b2edb2931b26)
 ![image](https://github.com/user-attachments/assets/c2808066-0890-4a0b-95cc-8e1120a93530)
 ![image](https://github.com/user-attachments/assets/f2cbbf63-d45b-4738-a62c-c6977b49cd13)
 ![image](https://github.com/user-attachments/assets/abdeb7c5-9be7-47fe-a0f2-1020c9fac7fb)
